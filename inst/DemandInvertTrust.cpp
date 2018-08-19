@@ -1,7 +1,6 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include "Demand.hpp"
-#include "DemandRoot.hpp"
 #include "DemandInvertTrust.hpp"
 //#include <stan/math.hpp>
 // [[Rcpp::depends(RcppEigen)]]
@@ -19,6 +18,7 @@ RcppExport SEXP DemandInvertTrust_Logit__new(Eigen::VectorXd delta_init, Eigen::
   return ptr;
 }
 
+
 Eigen::VectorXd DemandInvertTrust::root_cauchy() {
   error = 1000.0;
   int count = 0;
@@ -34,10 +34,10 @@ Eigen::VectorXd DemandInvertTrust::root_cauchy() {
 
   while(true){
     // compute_obj for current delta
-    this->compute(delta);
-    this->calcValue();
+    compute(delta);
+    calcObj_val();
     //this->calcGradient();
-    this->calcHessian();
+    calcHessian();
     //save the value of the obj under the old/current delta
     value_old = this->getValue();
 

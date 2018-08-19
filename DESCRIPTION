@@ -4,15 +4,14 @@ Version: 0.0.0.9000
 Authors@R: person("Joseph", "Rossetti", email = "joe.a.rossetti@gmail.com", role = c("aut", "cre"))
 Description: Estimate random coefficient GEV models of demand (e.g. logit, nested logit)
   using aggregate data based on the BLP (1995) model. This package serves largely as an interface
-  to C++ code that actually does the estimation.  The C++ code depends heavily on the Stan Math Library,
-  which provides a user friendly but efficient set of tools for statistical computation,
-  linear algebra, and automatic differentiation in C++.  The underlying C++ classes that
+  to C++ code that actually does the estimation.  The underlying C++ classes that
   represent the demand model are exposed to R as Rcpp External Pointers for testing,
   users should not need to use these functions directly.
 Depends: R (>= 3.5.0)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-LinkingTo: Rcpp, RcppEigen, StanHeaders, BH
-Imports: Rcpp, RcppEigen, StanHeaders, BH
+LinkingTo: Rcpp, RcppEigen, BH
+Imports: Rcpp, RcppEigen, BH
 RoxygenNote: 6.0.1
+Suggests: testthat

@@ -102,8 +102,21 @@ cpp_test <- microbenchmark::microbenchmark(
   trust_test_result <- trust::trust(my_f_cpp, parinit = rep(1.0,10), rinit = 0.1, rmax = 10.0, fterm = .Machine$double.eps,  blather = TRUE)
 )
 
-invert_test <- DemandInvertTrust_Logit__new(delta_init = rep(1.0, 10), s_0 = my_shares, mu_=my_mu, u_opt_out_ = 0.0,
-                             max_radius = 10.0, thresh = c(0.125,0.25,0.75),
-                             scale = c(0.25,2.0), tol = 1e-3, max_count = 1000)
 
-test_deltas <- DemandInvertTrust_Logit__root_cauchy(invert_test)
+
+f_maker_cpp_nloptr <- function(s_0, mu_mat, u_opt_out){
+  dlr_ptr <- DemandLogitRoot__new(s_0, mu_mat, u_opt_out)
+  f_ <- function(x){
+    DemandLogitRoot__compute_obj(dlr_ptr, x)
+    res <- list()
+    res$objective <- DemandLogitRoot__getValue(dlr_ptr)
+    res$gradient <- DemandLogitRoot__getGradient(dlr_ptr)
+    ##res$hessian <- DemandLogitRoot__getHessian(dlr_ptr)
+    return(res)
+  }
+  return(f_)
+}
+
+my_f_nloptr <- f_maker_cpp_nloptr(s_0 = my_shares, mu_mat = my_mu, u_opt_out = 0.0)
+
+nloptr::nloptr(x0 = rep(1.0, 10), eval_f =

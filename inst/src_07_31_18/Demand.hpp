@@ -8,7 +8,22 @@
 
 class DemandLogit {
 public:
-  DemandLogit(Eigen::MatrixXd mu_, double u_opt_out_);
+  DemandLogit(Eigen::MatrixXd mu_, double u_opt_out_) : mu(mu_), u_opt_out(u_opt_out_) {
+    N = mu.cols();
+    J = mu.rows();
+    N_ = 1/(double) N;
+
+    computed = false;
+    rooted = false;
+
+    delta.setZero(J);
+    shares.setZero(J,1);
+    inc_val = 0.0;
+    index_it.setZero(J,1);
+    gradient.setZero(J);
+    hessian.setZero(J,J);
+    obj_val = 0.0;
+  };
   void compute(Eigen::VectorXd delta_);
   Eigen::VectorXd getShares();
   double getIncValue();
@@ -27,12 +42,12 @@ protected:
   Eigen::VectorXd gradient;
   Eigen::MatrixXd hessian;
 private:
-  Eigen::VectorXd delta;
+  Eigen::MatrixXd mu;
   double u_opt_out;
   double N_;
   int J;
   int N;
-  Eigen::MatrixXd mu;
+  Eigen::VectorXd delta;
   Eigen::ArrayXd index_it;
   bool computed;
   bool rooted;

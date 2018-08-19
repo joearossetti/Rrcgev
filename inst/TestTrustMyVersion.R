@@ -34,33 +34,10 @@ exp_index_i <- exp(my_index_i2)
 s_i <- exp_index_i / matrix((colSums(exp_index_i) + exp(0-max_index)), J, my_num_draws, byrow = TRUE)
 my_shares = rowMeans(s_i)
 
-share_test <- DemandLogit__new(my_mu, 0.0)
+test_inverter <- InvertTrustMethod__new(delta_init = rep(1.0, 10), init_radius = 0.25,
+                                        s_0 = my_shares,
+                                        mu_ = my_mu, u_opt_out_ = 0.0,
+                                        max_radius = 2.0, thresh = c(0.125,0.25,0.75), scale = c(0.25,0.75),
+                                        tol = 1.0e-8, max_count = 100000)
 
-index_i_test <- DemandLogit__compute(share_test, my_delta)
-
-share_bench <- microbenchmark(
-  {share_test <- DemandLogit__new(my_mu, 0.0);
-  index_i_test <- DemandLogit__compute(share_test, my_delta)}
-)
-
-# share_tests <- DemandLogit__getShares(index_i_test)
-# inc_val_tests <- DemandLogit__getIncValue(index_i_test)
-#
-# abs(my_shares - share_tests) <= .Machine$double.eps
-#
-# index_i_test <- DemandLogit__setS_0(index_i_test, my_shares)
-#
-# index_i_test <- DemandLogit__calcObj_val(index_i_test)
-# obj_val_test <- DemandLogit__getObj_val(index_i_test)
-#
-# index_i_test <- DemandLogit__calcGradient(index_i_test)
-# grad_test <- DemandLogit__getGradient(index_i_test)
-#
-# index_i_test <- DemandLogit__calcHessian(index_i_test)
-# hess_test <- DemandLogit__getHessian(index_i_test)
-#
-# test_root <- root_lm(rep(1.0, 10), mu_ =  my_mu, u_opt_out_ = 0.0, s_0_ = my_shares)
-#
-# microbenchmark(
-#   test_root <- root_lm(rep(1.0, 10), mu_ =  my_mu, u_opt_out_ = 0.0, s_0_ = my_shares)
-# )
+test_inv_delta <- InvertTrustMethod_Logit__root_cauchy(test_inverter)

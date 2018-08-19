@@ -34,33 +34,18 @@ exp_index_i <- exp(my_index_i2)
 s_i <- exp_index_i / matrix((colSums(exp_index_i) + exp(0-max_index)), J, my_num_draws, byrow = TRUE)
 my_shares = rowMeans(s_i)
 
-share_test <- DemandLogit__new(my_mu, 0.0)
+my_dlf <- Dlfp10d1000__new()
 
-index_i_test <- DemandLogit__compute(share_test, my_delta)
+my_dlf <- Dlfp10d1000__setS_0(my_dlf, my_shares)
 
-share_bench <- microbenchmark(
-  {share_test <- DemandLogit__new(my_mu, 0.0);
-  index_i_test <- DemandLogit__compute(share_test, my_delta)}
+test_s_0 <- Dlfp10d1000__getS_0(my_dlf)
+
+my_dlf <- Dlfp10d1000__compute(my_dlf, my_delta, my_mu)
+
+test_shares <- Dlfp10d1000__getShares(my_dlf)
+
+microbenchmark(
+  {my_dlf <- Dlfp10d1000__new();
+  Dlfp10d1000__compute(my_dlf, my_delta, my_mu)}
 )
 
-# share_tests <- DemandLogit__getShares(index_i_test)
-# inc_val_tests <- DemandLogit__getIncValue(index_i_test)
-#
-# abs(my_shares - share_tests) <= .Machine$double.eps
-#
-# index_i_test <- DemandLogit__setS_0(index_i_test, my_shares)
-#
-# index_i_test <- DemandLogit__calcObj_val(index_i_test)
-# obj_val_test <- DemandLogit__getObj_val(index_i_test)
-#
-# index_i_test <- DemandLogit__calcGradient(index_i_test)
-# grad_test <- DemandLogit__getGradient(index_i_test)
-#
-# index_i_test <- DemandLogit__calcHessian(index_i_test)
-# hess_test <- DemandLogit__getHessian(index_i_test)
-#
-# test_root <- root_lm(rep(1.0, 10), mu_ =  my_mu, u_opt_out_ = 0.0, s_0_ = my_shares)
-#
-# microbenchmark(
-#   test_root <- root_lm(rep(1.0, 10), mu_ =  my_mu, u_opt_out_ = 0.0, s_0_ = my_shares)
-# )

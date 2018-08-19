@@ -30,13 +30,13 @@
 // };
 
 //template <>
-class DemandInvertTrust : public DemandLogitRoot{
+class DemandInvertTrust : public DemandLogit{
 public:
   DemandInvertTrust(Eigen::VectorXd delta_init, Eigen::VectorXd s_0, Eigen::MatrixXd mu_, double u_opt_out_,
                     double max_radius, Eigen::VectorXd thresh, Eigen::VectorXd scale,
                     double tol, int max_count) :
-  DemandLogitRoot(s_0, mu_, u_opt_out_), max_radius(max_radius),
-  thresh(thresh), scale(scale), tol(tol), max_count(max_count), delta(delta_init) {};
+  DemandLogit(mu_, u_opt_out_), max_radius(max_radius),
+  thresh(thresh), scale(scale), tol(tol), max_count(max_count), delta(delta_init) { setS_0(s_0) };
   Eigen::VectorXd root_cauchy();
   void solve_cauchy();
   //Eigen::VectorXd solve_dogleg();

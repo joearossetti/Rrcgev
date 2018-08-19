@@ -2,28 +2,8 @@
 #include <RcppEigen.h>
 #include "Demand.hpp"
 using namespace Rcpp;
+// [[Rcpp::depends(RcppEigen)]]
 
-DemandLogit::DemandLogit(Eigen::MatrixXd mu_, double u_opt_out_) {
-  mu = mu_;
-  u_opt_out = u_opt_out_;
-  N = mu.cols();
-  J = mu.rows();
-  N_ = 1/(double) N;
-
-  computed = false;
-  rooted = false;
-
-  delta.setZero(J);
-  shares.setZero(J,1);
-  inc_val = 0.0;
-  index_it.setZero(J,1);
-  gradient.setZero(J);
-  hessian.setZero(J,J);
-  obj_val = 0.0;
-
-  //index_i.setZero(J,N);
-  //denom_i.setZero(N);
-}
 
 //'@export
 // [[Rcpp::export]]
@@ -34,37 +14,44 @@ RcppExport SEXP DemandLogit__new(Eigen::MatrixXd mu_, double u_opt_out_) {
 }
 
 void DemandLogit::compute(Eigen::VectorXd delta_) {
-  double out_index = 0.0;
-  double max_index = 0.0;
-  double denom_temp = 0.0;
+  if(delta_.isApprox(delta, 2.0e-16)){
+    // already computed on that delta do nothing!
+    computed = true;
+  }else{
+    double out_index = 0.0;
+    double max_index = 0.0;
+    double denom_temp = 0.0;
 
-  delta = delta_;
+    delta = delta_;
 
-  // zero out the values
-  shares.setZero(J,1);
-  inc_val = 0.0;
-  index_it.setZero(J,1);
+    //Rcpp::Rcout << "computing shares" << std::endl;
 
-  for(int i =0; i < N; i++){
-    index_it = mu.col(i).array() + delta.array();
+    // zero out the values
+    shares.setZero(J,1);
+    inc_val = 0.0;
+    index_it.setZero(J,1);
 
-    // safety
-    max_index =  index_it.maxCoeff();
-    index_it -= max_index;
-    out_index = std::exp(u_opt_out - max_index);
-    //
+    for(int i =0; i < N; i++){
+      index_it = mu.col(i).array() + delta.array();
 
-    index_it = index_it.exp();
+      // safety
+      max_index =  index_it.maxCoeff();
+      index_it -= max_index;
+      out_index = std::exp(u_opt_out - max_index);
+      //
 
-    denom_temp = (index_it.sum() + out_index);
+      index_it = index_it.exp();
 
-    shares.array() += (index_it / denom_temp);
-    inc_val += denom_temp;
+      denom_temp = (index_it.sum() + out_index);
+
+      shares.array() += (index_it / denom_temp);
+      inc_val += denom_temp;
+    }
+
+    shares.array() *= N_;
+    inc_val *= N_;
+    computed = true;
   }
-
-  shares.array() *= N_;
-  inc_val *= N_;
-  computed = true;
 }
 
 //' @export
@@ -79,8 +66,22 @@ RcppExport SEXP DemandLogit__compute(SEXP xp, Eigen::VectorXd delta_) {
 }
 
 Eigen::VectorXd DemandLogit::getShares() {
-  return shares;
+  if(computed==true){
+    return shares;
+  }else{
+    DemandLogit::compute(delta);
+    return shares;
+  }
 }
+
+// Eigen::VectorXd DemandLogit::getShares(Eigen::VectorXd delta_) {
+//   if(computed==true && delta.array() == delta_.array()){
+//     return shares;
+//   }else{
+//     DemandLogit::compute(delta_);
+//     return shares;
+//   }
+// }
 
 //' @export
 // [[Rcpp::export]]

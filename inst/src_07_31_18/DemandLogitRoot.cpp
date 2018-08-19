@@ -2,10 +2,22 @@
 #include <RcppEigen.h>
 #include "Demand.hpp"
 using namespace Rcpp;
+// [[Rcpp::depends(RcppEigen)]]
 
 void DemandLogit::setS_0(Eigen::VectorXd s_0_) {
   s_0 = s_0_;
   rooted = true;
+}
+
+//' @export
+// [[Rcpp::export]]
+RcppExport SEXP DemandLogit__setS_0(SEXP xp, Eigen::VectorXd s_0_) {
+  // grap the object as an external pointer
+  Rcpp::XPtr<DemandLogit> ptr(xp);
+  //invoke the function
+  ptr->setS_0(s_0_);
+  //return the result
+  return ptr;
 }
 
 void DemandLogit::calcObj_val() {
@@ -16,12 +28,34 @@ void DemandLogit::calcObj_val() {
   }
 }
 
+//' @export
+// [[Rcpp::export]]
+RcppExport SEXP DemandLogit__calcObj_val(SEXP xp) {
+  // grap the object as an external pointer
+  Rcpp::XPtr<DemandLogit> ptr(xp);
+  //invoke the function
+  ptr->calcObj_val();
+  //return the result
+  return ptr;
+}
+
 void DemandLogit::calcGradient() {
   if(rooted == true && computed == true){
     gradient = shares - s_0;
   }else{
     Rcpp::Rcout << "not computed or not rooted" << std::endl;
   }
+}
+
+//' @export
+// [[Rcpp::export]]
+RcppExport SEXP DemandLogit__calcGradient(SEXP xp) {
+  // grap the object as an external pointer
+  Rcpp::XPtr<DemandLogit> ptr(xp);
+  //invoke the function
+  ptr->calcGradient();
+  //return the result
+  return ptr;
 }
 
 void DemandLogit::calcHessian() {
@@ -31,6 +65,17 @@ void DemandLogit::calcHessian() {
   }else{
     Rcpp::Rcout << "not computed or not rooted" << std::endl;
   }
+}
+
+//' @export
+// [[Rcpp::export]]
+RcppExport SEXP DemandLogit__calcHessian(SEXP xp) {
+  // grap the object as an external pointer
+  Rcpp::XPtr<DemandLogit> ptr(xp);
+  //invoke the function
+  ptr->calcHessian();
+  //return the result
+  return ptr;
 }
 
 Eigen::VectorXd DemandLogit::getGradient() {
